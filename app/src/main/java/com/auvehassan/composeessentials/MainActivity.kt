@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Greeting(name = "TestName")
+            Greeting(Message("TestAuthor", "TestBody"))
 //            Text(text = "Hello android")
 //            ComposeEssentialsTheme {
 //                // A surface container using the 'background' color from the theme
@@ -31,10 +31,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+data class Message(val author:String, val body:String)
+
 //To make a function composable, add the @Composable annotation
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
+fun Greeting(message: Message) {
+    Text(text = message.author)
+    Text(text = message.body)
 }
 
 //The @Preview annotation lets you preview your composable functions
@@ -42,6 +45,8 @@ fun Greeting(name: String) {
 @Composable
 fun DefaultPreview() {
     ComposeEssentialsTheme {
-        Greeting("Android")
+        Greeting(Message("Android Author", "Test Body"))
     }
+
 }
+
