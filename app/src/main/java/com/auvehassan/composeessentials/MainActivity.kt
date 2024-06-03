@@ -43,6 +43,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -53,6 +54,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.auvehassan.composeessentials.components.BadgeExample
+import com.auvehassan.composeessentials.components.ButtonExamples
+import com.auvehassan.composeessentials.components.CardExamples
+import com.auvehassan.composeessentials.components.CheckboxExamples
+import com.auvehassan.composeessentials.components.ChipExamples
+import com.auvehassan.composeessentials.components.DialogExamples
+import com.auvehassan.composeessentials.components.DividerExamples
+import com.auvehassan.composeessentials.components.FloatingActionButtonExamples
+import com.auvehassan.composeessentials.components.ProgressIndicatorExamples
+import com.auvehassan.composeessentials.components.ScaffoldExample
+import com.auvehassan.composeessentials.components.SliderExamples
+import com.auvehassan.composeessentials.components.SwitchExamples
 import com.auvehassan.composeessentials.ui.theme.BasicsCodelabTheme
 
 class MainActivity : ComponentActivity() {
@@ -68,47 +81,79 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MyApp(modifier: Modifier = Modifier) {
-    var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
-
     Surface(modifier, color = MaterialTheme.colorScheme.background) {
-        if (shouldShowOnboarding) {
-            OnboardingScreen(onContinueClicked = { shouldShowOnboarding = false })
-        } else {
-            Greetings()
+        var showItemOnClick by rememberSaveable { mutableIntStateOf(-1) }
+        if (showItemOnClick == 0){
+            ListsComponents()
+        }else if (showItemOnClick == 1){
+            ScaffoldExample()
+        }else {
+            LazyColumn {
+                item {
+                    Button(
+                        modifier = Modifier.padding(vertical = 24.dp),
+                        onClick = { showItemOnClick = 0 }
+                    ) {
+                        Text("Components")
+                    }
+                }
+                item {
+                    Button(
+                        modifier = Modifier.padding(vertical = 24.dp),
+                        onClick = { showItemOnClick = 1}
+                    ) {
+                        Text("LazyLists")
+                    }
+                }
+            }
         }
     }
 }
 
-@Composable
-fun OnboardingScreen(
-    onContinueClicked: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Welcome to the Basics Codelab!")
-        Button(
-            modifier = Modifier.padding(vertical = 24.dp),
-            onClick = onContinueClicked
-        ) {
-            Text("Continue")
-        }
-    }
-}
 
 @Composable
-private fun Greetings(
-    modifier: Modifier = Modifier,
-    names: List<String> = List(1000) { "$it" }
-) {
-    LazyColumn(modifier = modifier.padding(vertical = 4.dp)) {
-        items(items = names) { name ->
-            Greeting(name = name)
+private fun ListsComponents() {
+    // [START android_compose_layouts_lazy_column_basic]
+    LazyColumn {
+        // Add a single item
+        item {
+            BadgeExample()
+        }
+        item {
+            ButtonExamples()
+        }
+        item {
+            CardExamples()
+        }
+        item {
+            CheckboxExamples()
+        }
+        item {
+            ChipExamples()
+        }
+        item {
+            DialogExamples()
+        }
+        item {
+            DividerExamples()
+        }
+        item {
+            FloatingActionButtonExamples()
+        }
+        item {
+            ProgressIndicatorExamples()
+        }
+        item {
+            SliderExamples()
+        }
+        item {
+            SliderExamples()
+        }
+        item {
+            SwitchExamples()
         }
     }
+    // [END android_compose_layouts_lazy_column_basic]
 }
 
 @Composable
@@ -178,7 +223,6 @@ private fun CardContent(name: String) {
 @Composable
 fun DefaultPreview() {
     BasicsCodelabTheme {
-        Greetings()
     }
 }
 
@@ -186,7 +230,6 @@ fun DefaultPreview() {
 @Composable
 fun OnboardingPreview() {
     BasicsCodelabTheme {
-        OnboardingScreen(onContinueClicked = {})
     }
 }
 
