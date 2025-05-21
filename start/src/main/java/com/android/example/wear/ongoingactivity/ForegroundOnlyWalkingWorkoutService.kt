@@ -30,6 +30,8 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
+import androidx.wear.ongoing.OngoingActivity
+import androidx.wear.ongoing.Status
 import com.android.example.wear.ongoingactivity.data.WalkingWorkoutsRepository
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -307,6 +309,34 @@ class ForegroundOnlyWalkingWorkoutService : LifecycleService() {
 
         // TODO: Create an Ongoing Activity.
         // SKIP TODO FOR REVIEW STEP
+        val ongoingActivityStatus = Status.Builder()
+            // Sets the text used across various surfaces.
+            .addTemplate(mainText)
+            .build()
+
+        val ongoingActivity =
+            OngoingActivity.Builder(applicationContext, NOTIFICATION_ID, notificationBuilder)
+                // Sets icon that will appear on the watch face in active mode. If it isn't set,
+                // the watch face will use the static icon in active mode.
+                .setAnimatedIcon(R.drawable.animated_walk)
+                // Sets the icon that will appear on the watch face in ambient mode.
+                // Falls back to Notification's smallIcon if not set. If neither is set,
+                // an Exception is thrown.
+                .setStaticIcon(R.drawable.ic_walk)
+                // Sets the tap/touch event, so users can re-enter your app from the
+                // other surfaces.
+                // Falls back to Notification's contentIntent if not set. If neither is set,
+                // an Exception is thrown.
+                .setTouchIntent(activityPendingIntent)
+                // In our case, sets the text used for the Ongoing Activity (more options are
+                // available for timers and stop watches).
+                .setStatus(ongoingActivityStatus)
+                .build()
+
+// Applies any Ongoing Activity updates to the notification builder.
+// This method should always be called right before you build your notification,
+// since an Ongoing Activity doesn't hold references to the context.
+        ongoingActivity.apply(applicationContext)
 
         return notificationBuilder.build()
     }
