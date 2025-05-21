@@ -22,14 +22,16 @@
 
   <!-- TODO: Add the hasCode attribute to application -->
   <application
-    android:label="@string/watch_face_name"
-    *** Add hasCode attribute *** >
+      android:label="@string/watch_face_name"
+      android:hasCode="false">
 
 
   <!-- TODO: Add the WFF version property here -->
-
+    <property
+        android:name="com.google.wear.watchface.format.version"
+        android:value="1" />
 
     <meta-data android:name="com.google.android.wearable.standalone"
-      android:value="true"/>`
+      android:value="true"/>
   </application>
 </manifest>

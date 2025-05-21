@@ -18,4 +18,6 @@
 <WatchFaceInfo>
 
   <!-- TODO: Add the Preview and Editable elements here -->
+  <Preview value="@drawable/preview" />
+  <Editable value="true" />
 </WatchFaceInfo>
