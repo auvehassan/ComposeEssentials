@@ -16,12 +16,13 @@
 
 package com.example.wear.tiles.messaging.tile
 
+import android.content.ComponentName
 import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.wear.protolayout.ActionBuilders
+import androidx.wear.protolayout.ActionBuilders.launchAction
 import androidx.wear.protolayout.DeviceParametersBuilders.DeviceParameters
 import androidx.wear.protolayout.DimensionBuilders.expand
-import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.LayoutElementBuilders.CONTENT_SCALE_MODE_CROP
 import androidx.wear.protolayout.LayoutElementBuilders.Column
 import androidx.wear.protolayout.LayoutElementBuilders.FontSetting
@@ -41,15 +42,36 @@ import androidx.wear.protolayout.modifiers.LayoutModifier
 import androidx.wear.protolayout.modifiers.clickable
 import androidx.wear.protolayout.modifiers.clip
 import androidx.wear.protolayout.modifiers.padding
-import androidx.wear.protolayout.modifiers.toProtoLayoutModifiers
 import androidx.wear.protolayout.types.layoutString
 import androidx.wear.tiles.tooling.preview.Preview
 import androidx.wear.tiles.tooling.preview.TilePreviewData
 import androidx.wear.tiles.tooling.preview.TilePreviewHelper
 import androidx.wear.tooling.preview.devices.WearDevices
+import com.example.wear.tiles.messaging.MainActivity
 
 fun MaterialScope.contactButton(contact: Contact): LayoutElement {
-    val clickable = clickable() // TODO: Launch open conversation activity
+    val clickable = clickable(
+        id = contact.id.toString(),
+        action =
+            launchAction(
+                /* activityComponentName = */
+                ComponentName(
+                    "com.example.wear.tiles",
+                    "com.example.wear.tiles.messaging.MainActivity",
+                ),
+                /* intentExtras = */
+                mapOf(
+                    MainActivity.EXTRA_JOURNEY to
+                            ActionBuilders.stringExtra(
+                                MainActivity.EXTRA_JOURNEY_CONVERSATION
+                            ),
+                    MainActivity.EXTRA_CONVERSATION_CONTACT to
+                            ActionBuilders.stringExtra(
+                                contact.name
+                            ),
+                ),
+            ),
+    ) // TODO: Launch open conversation activity
     if (contact.avatarSource !is AvatarSource.None) {
         // If the contact has as associated image, display it.
         return avatarImage(
@@ -92,7 +114,51 @@ fun tileLayout(
         deviceConfiguration = deviceParameters,
         allowDynamicTheme = true,
     ) {
-        TODO() // Add primaryLayout()
+        primaryLayout(
+            mainSlot = {
+                Column.Builder().apply {
+                    setWidth(expand())
+                    setHeight(expand())
+                    addContent(
+                        buttonGroup {
+                            buttonGroupItem { contactButton(contacts[0]) }
+                            buttonGroupItem { contactButton(contacts[1]) }
+                        }
+                    )
+
+                    addContent(DEFAULT_SPACER_BETWEEN_BUTTON_GROUPS)
+
+                    addContent(
+                        buttonGroup {
+                            buttonGroupItem { contactButton(contacts[2]) }
+                            buttonGroupItem { contactButton(contacts[3]) }
+                        }
+                    )
+                }.build()
+            },
+
+            bottomSlot = {
+                textEdgeButton(
+                    onClick = clickable(
+                        id = "new_button",
+                        action =
+                            launchAction(
+                                ComponentName(
+                                    "com.example.wear.tiles",
+                                    "com.example.wear.tiles.messaging.MainActivity",
+                                ),
+                                mapOf(
+                                    MainActivity.EXTRA_JOURNEY to
+                                            ActionBuilders.stringExtra(
+                                                MainActivity.EXTRA_JOURNEY_NEW
+                                            )
+                                ),
+                            ),
+                    ), // TODO: Launch new conversation activity
+                    labelContent = { text("New".layoutString) },
+                )
+            },
+        )
     }
 }
 
@@ -126,6 +192,22 @@ internal fun tileLayoutPreview(context: Context): TilePreviewData {
                 .build()
         },
         // TODO: Add onTileResourceRequest
+        // Additional named argument to TilePreviewData
+        onTileResourceRequest = { resourcesRequest ->
+            Resources.Builder()
+                .setVersion(resourcesRequest.version)
+                .apply {
+                    contacts.forEach {
+                        if (it.avatarSource is AvatarSource.Resource) {
+                            addIdToImageMapping(
+                                it.imageResourceId(),
+                                it.avatarSource.resourceId
+                            )
+                        }
+                    }
+                }
+                .build()
+        }
     )
 }
 

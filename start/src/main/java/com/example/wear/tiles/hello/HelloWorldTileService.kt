@@ -66,8 +66,15 @@ fun tileLayout(
     deviceConfiguration: DeviceParametersBuilders.DeviceParameters,
     message: String,
 ): LayoutElementBuilders.LayoutElement {
-    TODO()
+    return materialScope(
+        context = context,
+        deviceConfiguration = deviceConfiguration,
+        allowDynamicTheme = false,
+    ) {
+        primaryLayout(mainSlot = { text(message.layoutString) })
+    }
 }
+
 
 @Preview(device = WearDevices.SMALL_ROUND, name = "Small Round")
 @Preview(device = WearDevices.LARGE_ROUND, name = "Large Round")

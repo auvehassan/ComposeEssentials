@@ -89,7 +89,38 @@ class MessagingTileService : SuspendingTileService() {
      * list of strings; these are *not* Android resource ids.)
      */
     override suspend fun resourcesRequest(requestParams: ResourcesRequest): Resources {
-        TODO()
+        // resourceIds is a list of the ids we need to provide images for. If we're passed an empty
+        // list, set resourceIds to all resources.
+        val resourceIds =
+            requestParams.resourceIds.ifEmpty {
+                contacts.map { it.imageResourceId() }
+            }
+
+        // resourceMap maps (tile) resource ids to (Android) resource ids.
+        val resourceMap =
+            contacts
+                .mapNotNull {
+                    when (it.avatarSource) {
+                        is AvatarSource.Resource ->
+                            it.imageResourceId() to it.avatarSource.resourceId
+
+                        else -> null
+                    }
+                }
+                .toMap()
+                .filterKeys {
+                    it in resourceIds
+                } // filter to only the resources we need
+
+        // Add images in the resourceMap to the Resources object, and return the result.
+        return Resources.Builder()
+            .setVersion(requestParams.version)
+            .apply {
+                resourceMap.forEach { (id, imageResource) ->
+                    addIdToImageMapping(id, imageResource)
+                }
+            }
+            .build()
     }
 }
 
